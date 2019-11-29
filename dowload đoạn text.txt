@@ -1,0 +1,1 @@
+window.open("data:application/txt," + encodeURI(JSON.stringify(res.result.items)))
