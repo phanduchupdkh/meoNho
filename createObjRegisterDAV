@@ -1,0 +1,47 @@
+const fetch = require('cross-fetch')
+const fs = require('fs')
+let objRegisterNewDrug = {}
+
+async function getAndWriteNewDrugDAV(i) {
+  await fetch("https://dichvucong.dav.gov.vn/api/services/app/soDangKy/GetAllPublicServerPaging", {
+    "credentials": "include",
+    "headers": {
+      "accept": "application/json, text/javascript, */*; q=0.01",
+      "accept-language": "en-US,en;q=0.9",
+      "cache-control": "no-cache",
+      "content-type": "application/json",
+      "expires": "Sat, 01 Jan 2000 00:00:00 GMT", "pragma": "no-cache",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "x-requested-with": "XMLHttpRequest",
+      "x-xsrf-token": "_Xa0cj9tTPV71wCnECVYoBUrMl1dc-iaFecHpixsHoGb1mdYqZWZCunWCmGlJlZE6ZsZZbjkU-xQxnqlVpQnCwQBZD3rf5JIZKD4CVN16TY1"
+    },
+    "referrer": "https://dichvucong.dav.gov.vn/congbothuoc/index",
+    "referrerPolicy": "no-referrer-when-downgrade",
+    "body": `{\"SoDangKyThuoc\":{},\"KichHoat\":true,\"skipCount\":${1000 * i},\"maxResultCount\":1000,\"sorting\":null}`,
+    "method": "POST",
+    "mode": "cors"
+  })
+    .then(res => res.json())
+    .then(res => {
+      res.result.items.forEach(item => {
+        objRegisterNewDrug[item.soDangKy] = '1'
+      })
+      console.log('trong', i)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+let count = 0
+
+async function createObjRegisterDAV() {
+  while (count < 42) {
+    await getAndWriteNewDrugDAV(count)
+    count++
+    console.log('ngoai: ', count)
+  }
+  fs.writeFileSync('objRegisterDAV.json', JSON.stringify(objRegisterNewDrug), 'utf-8')
+}
+createObjRegisterDAV()
