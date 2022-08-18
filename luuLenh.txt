@@ -1,0 +1,3 @@
+xem số dòng trong file: 
+
+find . -type f -name '*.js' | xargs wc -l
